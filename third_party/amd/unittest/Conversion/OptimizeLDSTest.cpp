@@ -8,7 +8,8 @@ namespace mlir {
 
 template <unsigned P> bool checkProdEq(ArrayRef<unsigned> a) {
   unsigned prod =
-      std::reduce(a.begin(), a.end(), 1u, std::multiplies<unsigned>());
+      // std::reduce(a.begin(), a.end(), 1u, std::multiplies<unsigned>());
+      std::accumulate(a.begin(), a.end(), 1u, std::multiplies<unsigned>());
   return prod == P;
 }
 
