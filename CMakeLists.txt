@@ -12,6 +12,13 @@ set(CMAKE_CXX_STANDARD 17)
 
 set(CMAKE_INCLUDE_CURRENT_DIR ON)
 
+if(NOT CMAKE_C_COMPILER)
+  set(CMAKE_C_COMPILER clang13)
+endif()
+if(NOT CMAKE_CXX_COMPILER)
+  set(CMAKE_CXX_COMPILER clang++13)
+endif()
+
 project(triton)
 include(CTest)
 
@@ -22,6 +29,7 @@ endif()
 
 
 # Options
+option(TRITON_BUILD_LLVM_IN_TREE "Build LLVM in-tree" ON)
 option(TRITON_BUILD_TUTORIALS "Build C++ Triton tutorials" ON)
 option(TRITON_BUILD_PYTHON_MODULE "Build Python Triton bindings" OFF)
 option(TRITON_BUILD_PROTON "Build the Triton Proton profiler" ON)
@@ -53,25 +61,53 @@ endif()
 
 # Compiler flags
 include_directories(${CMAKE_CURRENT_SOURCE_DIR}/include)
-set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -D__STDC_FORMAT_MACROS  -fPIC -std=gnu++17")
-
+#set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -D__STDC_FORMAT_MACROS  -fPIC -std=gnu++17 -Wno-error=type-limits -Wno-error=cast-qual -Wno-error=enum-compare -Wno-error=stringop-overflow= -Wno-error=sign-compare  -Wno-error=unused-variable -fvisibility=hidden -fvisibility-inlines-hidden")
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -D__STDC_FORMAT_MACROS  -fPIC -std=gnu++17 -w")
 
 # #########
 # LLVM
 # #########
+if(TRITON_BUILD_LLVM_IN_TREE)
+  list(APPEND CMAKE_MODULE_PATH "${PROJECT_SOURCE_DIR}/cmake/modules")
+  include(llvm)
+
+  include(TableGen) # required by AddMLIR
+  include(AddLLVM)
+  include(AddMLIR)
+
+  list(APPEND LLVM_INCLUDE_DIRS
+    ${CMAKE_SOURCE_DIR}/external/llvm-project/llvm/include
+    ${CMAKE_BINARY_DIR}/llvm/include
+    )
+  list(APPEND MLIR_INCLUDE_DIRS
+    ${CMAKE_SOURCE_DIR}/external/llvm-project/mlir/include
+    ${CMAKE_BINARY_DIR}/llvm/tools/mlir/include
+    )
+  set(LLVM_LIBRARY_DIR ${CMAKE_BINARY_DIR}/llvm/lib)
+  set(LLVM_TOOLS_DIR ${CMAKE_BINARY_DIR}/llvm/bin)
+  message(STATUS "LLVM_TOOLS_DIR=${LLVM_TOOLS_DIR}")
+endif()
+
 if(NOT MLIR_DIR)
-  set(MLIR_DIR ${LLVM_LIBRARY_DIR}/cmake/mlir)
+  if(TRITON_BUILD_LLVM_IN_TREE)
+    set(MLIR_DIR ${CMAKE_BINARY_DIR}/lib/cmake/mlir)
+  else()
+    set(MLIR_DIR ${LLVM_LIBRARY_DIR}/cmake/mlir)
+  endif()
 endif()
 
 # MLIR
-find_package(MLIR REQUIRED CONFIG PATHS ${MLIR_DIR})
+if(NOT TRITON_BUILD_LLVM_IN_TREE)
+  find_package(MLIR REQUIRED CONFIG PATHS ${MLIR_DIR})
 
-list(APPEND CMAKE_MODULE_PATH "${MLIR_CMAKE_DIR}")
-list(APPEND CMAKE_MODULE_PATH "${LLVM_CMAKE_DIR}")
+  list(APPEND CMAKE_MODULE_PATH "${MLIR_CMAKE_DIR}")
+  list(APPEND CMAKE_MODULE_PATH "${LLVM_CMAKE_DIR}")
 
-include(TableGen) # required by AddMLIR
-include(AddLLVM)
-include(AddMLIR)
+  include(TableGen) # required by AddMLIR
+  include(AddLLVM)
+  include(AddMLIR)
+endif()
+message(STATUS "Config LLVM done. MLIR_DIR=${MLIR_DIR}")
 
 # Utilities
 function(add_triton_object name)

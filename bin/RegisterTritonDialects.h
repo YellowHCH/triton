@@ -37,11 +37,11 @@ inline void registerTritonDialects(mlir::DialectRegistry &registry) {
   mlir::registerTritonPasses();
   mlir::triton::gpu::registerTritonGPUPasses();
   mlir::registerTritonNvidiaGPUPasses();
-  mlir::test::registerTestAliasPass();
-  mlir::test::registerTestAlignmentPass();
-  mlir::test::registerTestAllocationPass();
-  mlir::test::registerTestMembarPass();
-  mlir::triton::registerConvertTritonToTritonGPUPass();
+  //mlir::test::registerTestAliasPass();
+  //mlir::test::registerTestAlignmentPass();
+  //mlir::test::registerTestAllocationPass();
+  //mlir::test::registerTestMembarPass();
+  //mlir::triton::registerConvertTritonToTritonGPUPass();
   mlir::triton::registerAllocateSharedMemoryPass();
   mlir::triton::registerConvertTritonGPUToLLVMPass();
   mlir::triton::registerConvertNVGPUToLLVMPass();
