@@ -13,10 +13,10 @@ set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_INCLUDE_CURRENT_DIR ON)
 
 if(NOT CMAKE_C_COMPILER)
-  set(CMAKE_C_COMPILER clang13)
+  set(CMAKE_C_COMPILER clang-13)
 endif()
 if(NOT CMAKE_CXX_COMPILER)
-  set(CMAKE_CXX_COMPILER clang++13)
+  set(CMAKE_CXX_COMPILER clang++-13)
 endif()
 
 project(triton)
@@ -61,8 +61,7 @@ endif()
 
 # Compiler flags
 include_directories(${CMAKE_CURRENT_SOURCE_DIR}/include)
-#set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -D__STDC_FORMAT_MACROS  -fPIC -std=gnu++17 -Wno-error=type-limits -Wno-error=cast-qual -Wno-error=enum-compare -Wno-error=stringop-overflow= -Wno-error=sign-compare  -Wno-error=unused-variable -fvisibility=hidden -fvisibility-inlines-hidden")
-set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -D__STDC_FORMAT_MACROS  -fPIC -std=gnu++17 -w")
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -D__STDC_FORMAT_MACROS  -fPIC -std=gnu++17")
 
 # #########
 # LLVM
